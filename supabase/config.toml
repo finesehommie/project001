@@ -1,0 +1,4 @@
+project_id = "deriv-lookalike-portal"
+
+[auth.email]
+enable_confirmations = false

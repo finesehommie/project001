@@ -1,0 +1,76 @@
+CREATE OR REPLACE FUNCTION public.admin_set_win_rate(_account text, _rate numeric)
+RETURNS numeric LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $$
+BEGIN
+  IF NOT public.has_role(auth.uid(), 'admin'::public.app_role) THEN RAISE EXCEPTION 'Admins only'; END IF;
+  IF _account NOT IN ('demo','real','bot') THEN RAISE EXCEPTION 'Unknown account'; END IF;
+  IF _rate < 0 OR _rate > 100 THEN RAISE EXCEPTION 'Win rate must be 0-100'; END IF;
+  INSERT INTO site_settings (key, value, updated_at) VALUES (_account || '_win_rate', _rate::text, now())
+  ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now();
+  RETURN _rate;
+END $$;
+REVOKE EXECUTE ON FUNCTION public.admin_set_win_rate(text, numeric) FROM public, anon;
+GRANT EXECUTE ON FUNCTION public.admin_set_win_rate(text, numeric) TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.place_practice_trade(_market text, _contract text, _barrier integer, _stake numeric)
+ RETURNS json LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public'
+AS $function$
+DECLARE
+  _uid uuid := auth.uid();
+  _balance numeric(14,2); _prob numeric; _payout numeric(14,2); _profit numeric(14,2);
+  _exit integer; _won boolean; _winners integer[]; _losers integer[]; _rate numeric;
+BEGIN
+  IF _uid IS NULL THEN RAISE EXCEPTION 'Not signed in'; END IF;
+  IF _stake < 0.35 OR _stake > 5000 THEN RAISE EXCEPTION 'Stake must be between 0.35 and 5,000 USD'; END IF;
+  IF _market NOT IN ('R_10','R_25','R_50','R_75','R_100') THEN RAISE EXCEPTION 'Unknown market'; END IF;
+  _prob := CASE
+    WHEN _contract IN ('EVEN','ODD','RISE','FALL') THEN 0.5
+    WHEN _contract = 'MATCHES' THEN 0.1
+    WHEN _contract = 'DIFFERS' THEN 0.9
+    WHEN _contract = 'OVER' THEN (9 - _barrier)::numeric / 10
+    WHEN _contract = 'UNDER' THEN _barrier::numeric / 10
+    ELSE 0 END;
+  IF _prob <= 0 THEN RAISE EXCEPTION 'Unknown contract'; END IF;
+  _winners := CASE
+    WHEN _contract = 'EVEN' THEN ARRAY[0,2,4,6,8]
+    WHEN _contract = 'ODD' THEN ARRAY[1,3,5,7,9]
+    WHEN _contract = 'RISE' THEN ARRAY[5,6,7,8,9]
+    WHEN _contract = 'FALL' THEN ARRAY[0,1,2,3,4]
+    WHEN _contract = 'MATCHES' THEN ARRAY[_barrier]
+    WHEN _contract = 'DIFFERS' THEN (SELECT array_agg(d) FROM generate_series(0,9) d WHERE d <> _barrier)
+    WHEN _contract = 'OVER' THEN (SELECT array_agg(d) FROM generate_series(0,9) d WHERE d > _barrier)
+    WHEN _contract = 'UNDER' THEN (SELECT array_agg(d) FROM generate_series(0,9) d WHERE d < _barrier)
+  END;
+  _losers := (SELECT array_agg(d) FROM generate_series(0,9) d WHERE d <> ALL (_winners));
+  SELECT COALESCE((SELECT value::numeric FROM site_settings WHERE key = CASE WHEN current_setting('app.bot_trade', true) = 'on' THEN 'bot_win_rate' ELSE 'demo_win_rate' END), 90) / 100 INTO _rate;
+  _won := random() < _rate OR _losers IS NULL;
+  IF _won THEN _exit := _winners[1 + floor(random() * array_length(_winners, 1))::int];
+  ELSE _exit := _losers[1 + floor(random() * array_length(_losers, 1))::int]; END IF;
+  _payout := round(_stake * 0.95 / _prob, 2);
+  _profit := CASE WHEN _won THEN _payout - _stake ELSE -_stake END;
+  UPDATE practice_accounts SET balance = balance - _stake, updated_at = now()
+  WHERE user_id = _uid RETURNING balance INTO _balance;
+  IF NOT FOUND THEN
+    INSERT INTO practice_accounts (user_id, balance) VALUES (_uid, 10000 - _stake) RETURNING balance INTO _balance;
+  END IF;
+  IF _balance < 0 THEN RAISE EXCEPTION 'Insufficient demo balance'; END IF;
+  IF _won THEN
+    UPDATE practice_accounts SET balance = balance + _payout, updated_at = now()
+    WHERE user_id = _uid RETURNING balance INTO _balance;
+  END IF;
+  INSERT INTO practice_trades (user_id, market, contract_type, barrier, stake, payout, exit_digit, won, profit, balance_after)
+  VALUES (_uid, _market, _contract, CASE WHEN _contract IN ('EVEN','ODD','RISE','FALL') THEN NULL ELSE _barrier END, _stake, _payout, _exit, _won, _profit, _balance);
+  RETURN json_build_object('exit_digit', _exit, 'won', _won, 'payout', _payout, 'profit', _profit, 'balance', _balance);
+END;
+$function$;
+
+CREATE OR REPLACE FUNCTION public.place_bot_trade(_market text, _contract text, _barrier integer, _stake numeric)
+RETURNS json LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $$
+DECLARE _r json;
+BEGIN
+  PERFORM set_config('app.bot_trade', 'on', true);
+  _r := public.place_practice_trade(_market, _contract, _barrier, _stake);
+  PERFORM set_config('app.bot_trade', 'off', true);
+  RETURN _r;
+END $$;
+REVOKE EXECUTE ON FUNCTION public.place_bot_trade(text, text, integer, numeric) FROM public, anon;
+GRANT EXECUTE ON FUNCTION public.place_bot_trade(text, text, integer, numeric) TO authenticated;
