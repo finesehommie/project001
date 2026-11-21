@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { CRYPTO_COINS, simulatedInvoice, type CoinId } from '@/lib/crypto-pay';
+import { CRYPTO_COINS, simulatedMegaPayInvoice, type CoinId } from '@/lib/crypto-pay';
 import { useSession } from '@/components/session-context';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -23,7 +23,7 @@ export function AccountDashboard() {
   const [method, setMethod] = useState('Crypto');
   const [submitting, setSubmitting] = useState(false);
   const [coin, setCoin] = useState<CoinId>('USDTTRC20');
-  const [invoice, setInvoice] = useState<ReturnType<typeof simulatedInvoice> | null>(null);
+  const [invoice, setInvoice] = useState<ReturnType<typeof simulatedMegaPayInvoice> | null>(null);
   const isCrypto = method === 'Crypto';
 
   const account = useQuery({ queryKey: ['practice-balance', user?.id], enabled: !!user, queryFn: async () => { const { data, error } = await supabase.rpc('get_practice_account'); if (error) throw error; return Number(data); } });
@@ -62,14 +62,16 @@ export function AccountDashboard() {
     const value = Number(amount);
     if (!(value > 0)) { toast.error('Enter an amount greater than zero.'); return; }
     if (fundsDialog === 'withdraw' && value > realBalance) { toast.error('Amount is more than your available balance.'); return; }
-    if (fundsDialog === 'deposit' && isCrypto && !invoice) { setInvoice(simulatedInvoice(coin, value)); return; }
+    if (fundsDialog === 'deposit' && isCrypto && !invoice) { setInvoice(simulatedMegaPayInvoice(coin, value)); return; }
     setSubmitting(true);
     const { error } = fundsDialog === 'deposit'
       ? await supabase.from('deposits').insert({ user_id: user!.id, amount: value, method: isCrypto && invoice ? `Crypto ${invoice.coin.label} · ${invoice.paymentId}` : method, status: 'pending' })
       : await supabase.from('withdrawal_requests').insert({ user_id: user!.id, amount: value, method });
     setSubmitting(false);
     if (error) { toast.error(error.message); return; }
-    toast.success(fundsDialog === 'deposit' ? 'Deposit request sent. It will appear once confirmed.' : 'Withdrawal request sent. You will see it once processed.');
+    toast.success(fundsDialog === 'deposit'
+      ? isCrypto && invoice ? 'Demo request recorded. No payment was sent or received.' : 'Deposit request sent. It will appear once confirmed.'
+      : 'Withdrawal request sent. You will see it once processed.');
     setFundsDialog(null); setAmount(''); setInvoice(null);
     qc.invalidateQueries({ queryKey: ['my-deposits', user?.id] });
     qc.invalidateQueries({ queryKey: ['my-withdrawals', user?.id] });
@@ -122,19 +124,17 @@ export function AccountDashboard() {
         <form onSubmit={submitFunds} className="grid gap-3">
           <Input aria-label="Amount" type="number" min="0.01" step="0.01" placeholder="Amount (USD)" value={amount} onChange={e => { setAmount(e.target.value); setInvoice(null); }} required />
           <select aria-label="Method" className="h-10 rounded-md border bg-background px-3" value={method} onChange={e => { setMethod(e.target.value); setInvoice(null); }}>
-            <option value="Crypto">Crypto (NOWPayments)</option><option value="M-Pesa">M-Pesa</option><option value="Bank transfer">Bank transfer</option><option value="Card">Card</option>
+            <option value="Crypto">Crypto (MegaPay test mode)</option><option value="M-Pesa">M-Pesa</option><option value="Bank transfer">Bank transfer</option><option value="Card">Card</option>
           </select>
           {fundsDialog === 'deposit' && isCrypto && <select aria-label="Coin" className="h-10 rounded-md border bg-background px-3" value={coin} onChange={e => { setCoin(e.target.value as CoinId); setInvoice(null); }}>{CRYPTO_COINS.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}</select>}
           {fundsDialog === 'deposit' && isCrypto && invoice && <div className="crypto-invoice">
-            <span className="sim-badge">Test mode · simulated</span>
-            <p>Send exactly</p><strong className="crypto-amount">{invoice.payAmount} {invoice.coin.id === 'USDTTRC20' ? 'USDT' : invoice.coin.id}</strong>
-            <p>to this {invoice.coin.label} address</p>
-            <code className="crypto-address">{invoice.address}</code>
-            <Button type="button" variant="outline" size="sm" onClick={() => { void navigator.clipboard?.writeText(invoice.address); toast.success('Address copied'); }}>Copy address</Button>
-            <small>Payment ID {invoice.paymentId} · expires {new Date(invoice.expiresAt).toLocaleTimeString()}. This is a simulated checkout — no crypto provider is connected yet, so don't send real funds.</small>
+            <span className="sim-badge">MegaPay test mode · simulated</span>
+            <p>This sample checkout is for display testing only.</p>
+            <strong className="crypto-amount">{invoice.payAmount} {invoice.coin.id === 'USDTTRC20' ? 'USDT' : invoice.coin.id}</strong>
+            <small>Demo reference {invoice.paymentId} · sample expires {new Date(invoice.expiresAt).toLocaleTimeString()}. MegaPay is not configured. No payment address is provided, no funds are sent or received, and this will not fund your balance.</small>
           </div>}
           {fundsDialog === 'deposit' && !isCrypto && <p className="text-sm text-muted-foreground">After you submit, our team will send you {method} payment details. Your balance updates once the payment is confirmed.</p>}
-          <Button type="submit" disabled={submitting}>{submitting ? 'Sending…' : fundsDialog === 'deposit' ? (isCrypto ? (invoice ? "I've sent the payment" : 'Generate payment address') : 'Send deposit request') : 'Request withdrawal'}</Button>
+          <Button type="submit" disabled={submitting}>{submitting ? 'Sending…' : fundsDialog === 'deposit' ? (isCrypto ? (invoice ? 'Record demo request' : 'Preview simulated checkout') : 'Send deposit request') : 'Request withdrawal'}</Button>
         </form>
       </DialogContent>
     </Dialog>
