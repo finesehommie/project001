@@ -1,12 +1,12 @@
 import { Link } from '@tanstack/react-router';
+import { ChartNoAxesCombined } from 'lucide-react';
 import { useSiteName } from '@/hooks/use-site-name';
-import logo from '@/assets/sosderiv-logo-small.png';
 
 export function Brand() {
   const name = useSiteName();
   return (
     <Link to="/" className="brand" aria-label={`${name} home`}>
-      <img className="brand-logo" src={logo} alt="" width={40} height={40} />
+      <ChartNoAxesCombined className="brand-logo" aria-hidden="true" />
       <span className="brand-type">{name}</span>
     </Link>
   );

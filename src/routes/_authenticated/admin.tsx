@@ -14,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { pageHead } from '@/lib/page-head';
 
 export const Route = createFileRoute('/_authenticated/admin')({
-  head: () => pageHead('Admin Panel | SOSDERIV', 'Admin overview of all SOSDERIV users, demo balances and deposit records.'),
+  head: () => pageHead('Admin Panel | Option Market Traders', 'Admin overview of all Option Market Traders users, demo balances and deposit records.'),
   component: AdminPage,
 });
 

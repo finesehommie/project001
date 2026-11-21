@@ -12,7 +12,7 @@ import { getTheme, setTheme as saveTheme, type Theme } from '@/lib/theme';
 import { setSoundEnabled, soundEnabled, sounds } from '@/lib/sounds';
 
 export const Route = createFileRoute('/_authenticated/settings')({
-  head: () => pageHead('Account Settings | SOSDERIV', 'Manage your SOSDERIV sign-in details, password and trading sound preferences.'),
+  head: () => pageHead('Account Settings | Option Market Traders', 'Manage your Option Market Traders sign-in details, password and trading sound preferences.'),
   component: SettingsPage,
 });
 

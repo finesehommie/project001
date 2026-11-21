@@ -16,6 +16,7 @@ import { SessionContext } from '@/components/session-context';
 import { applyTheme } from '@/lib/theme';
 import { Toaster } from '@/components/ui/sonner';
 import { POST_AUTH_TARGET, clearPostAuthTarget, shouldOpenTerminalAfterSignIn } from '@/lib/post-auth';
+import { DEFAULT_SITE_NAME } from '@/hooks/use-site-name';
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -85,10 +86,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SOSDERIV" },
-      { name: "description", content: "Explore the markets with SOSDERIV." },
-      { property: "og:title", content: "SOSDERIV" },
-      { property: "og:description", content: "Explore the markets with SOSDERIV." },
+      { title: DEFAULT_SITE_NAME },
+      { name: "description", content: "Explore markets and practice trading with Option Market Traders." },
+      { property: "og:title", content: DEFAULT_SITE_NAME },
+      { property: "og:description", content: "Explore markets and practice trading with Option Market Traders." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -97,7 +98,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: "/favicon.png", type: "image/png" },
+      { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" },

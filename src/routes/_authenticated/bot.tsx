@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { pageHead } from '@/lib/page-head';
 
 export const Route = createFileRoute('/_authenticated/bot')({
-  head: () => pageHead('Trading Bot | SOSDERIV', 'Automate demo digit trades with Martingale, D’Alembert and fixed-stake strategies.'),
+  head: () => pageHead('Trading Bot | Option Market Traders', 'Automate demo digit trades with Martingale, D’Alembert and fixed-stake strategies.'),
   component: BotPage,
 });
 

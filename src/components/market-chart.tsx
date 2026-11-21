@@ -87,7 +87,7 @@ export function MarketChart({ ticks, decimals, symbol, position }: { ticks: Mark
     const key = `${symbol}-${mode}-${interval}-${ready}`;
     if (fitted.current !== key) { const n = mode === 'line' ? ticks.length : Math.ceil((ticks.at(-1)!.epoch - ticks[0]!.epoch) / interval); const show = mode === 'line' ? 300 : 90; chart.current?.timeScale().setVisibleLogicalRange({ from: Math.max(0, n - show), to: n + 6 }); fitted.current = key; }
   }, [ticks, mode, interval, ready, symbol]);
-  // Open position overlay: entry line, entry/exit markers and a shaded run, like Deriv.
+  // Open position overlay: entry line, entry/exit markers and a shaded run, with clear entry, exit, and price markers.
   const hadPosition = useRef(false);
   useEffect(() => {
     if (position && !hadPosition.current) setMode('line');

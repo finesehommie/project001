@@ -13,7 +13,7 @@ import { useSimulatedMarket } from '@/hooks/use-simulated-market';
 import { MarketChart } from '@/components/market-chart';
 
 export const Route = createFileRoute('/_authenticated/trade')({
-  head: () => pageHead('Digit Trading | SOSDERIV', 'Practise Over/Under, Matches/Differs and Even/Odd digit contracts on simulated volatility markets with easy ~90% win-rate demo settlement.'),
+  head: () => pageHead('Digit Trading | Option Market Traders', 'Practise Over/Under, Matches/Differs and Even/Odd digit contracts on simulated volatility markets with easy ~90% win-rate demo settlement.'),
   component: TradePage,
 });
 
@@ -143,13 +143,13 @@ function TradePage() {
     </div>
     <div className="trade-layout">
       <section className="trade-chart-card">
-        <div className="live-market-heading"><div><p className="section-kicker">SIMULATED MARKET DATA</p><h1>{market.name}</h1></div><span className={`feed-status ${feed.status}`} role="status"><i />{feed.status === 'live' ? 'Live' : feed.status === 'connecting' ? 'Connecting' : 'Disconnected'}</span></div>
+        <div className="live-market-heading"><div><p className="section-kicker">SIMULATED MARKET DATA</p><h1>{market.name}</h1></div><span className={`feed-status ${feed.status}`} role="status"><i />{feed.status === 'live' ? 'Simulated' : feed.status === 'connecting' ? 'Connecting' : 'Disconnected'}</span></div>
         <div className="live-market-price"><strong className={price >= prev ? 'up' : 'down'}>{ticks.length ? price.toFixed(feed.decimals) : '—'}</strong><span className={price >= prev ? 'up' : 'down'}>{ticks.length > 1 ? `${price >= prev ? '+' : ''}${(price - prev).toFixed(feed.decimals)}` : '—'}</span><small>{feed.updated ? new Date(feed.updated * 1000).toISOString().slice(11, 19) + ' UTC' : 'Awaiting prices'}</small></div>
         {feed.error && <div className="feed-error" role="alert">{feed.error}<Button variant="outline" size="sm" onClick={feed.reconnect}>Reconnect</Button></div>}
         <MarketChart ticks={feed.ticks} decimals={feed.decimals} symbol={market.id} position={running ? { entry: running.entry, entryEpoch: running.entryEpoch, contract: running.contract, left: running.left, total: running.total, won: running.won } : null} />
         <div className="digit-stats-heading"><h2>Last digit distribution</h2><span>{Math.min(ticks.length, 100)} market ticks · Last digit {ticks.length ? digit : '—'}</span></div>
         <div className="digit-row" aria-label="Last digit statistics">{stats.map((s, d) => <div key={d} className={`digit-cell ${d === digit ? 'current' : ''} ${s === Math.max(...stats) ? 'hi' : ''} ${s === Math.min(...stats) ? 'lo' : ''}`}><span className="digit-num">{d}</span><small>{s.toFixed(1)}%</small></div>)}</div>
-        <p className="trade-hint">Source: SOSDERIV · Simulated prices for practice only.</p>
+        <p className="trade-hint">Simulated prices ? Demo contracts only.</p>
         {running && <div className="trade-status tick-tracker"><span>{running.contract.toLowerCase()} · entry {running.entry.toFixed(feed.decimals)}</span><span className="tick-dots" aria-label={`${running.total - running.left} of ${running.total} ticks`}>{Array.from({ length: running.total }, (_, i) => <i key={i} className={i < running.total - running.left ? 'done' : i === running.total - running.left ? 'now' : ''} />)}</span><span>{running.left} left</span></div>}
         {lastResult && !running && <div className={`trade-status ${lastResult.won ? 'won' : 'lost'}`}>{lastResult.won ? `You won ${money(lastResult.profit)} USD` : `You lost ${money(-lastResult.profit)} USD`} — demo exit digit {lastResult.digit}</div>}
       </section>

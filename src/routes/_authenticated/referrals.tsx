@@ -11,7 +11,7 @@ import { pageHead } from '@/lib/page-head';
 import { referralCodeFor } from '@/lib/referral';
 
 export const Route = createFileRoute('/_authenticated/referrals')({
-  head: () => pageHead('Refer & Earn | SOSDERIV', 'Invite friends to SOSDERIV and earn a bonus when they make their first deposit and trade.'),
+  head: () => pageHead('Refer & Earn | Option Market Traders', 'Invite friends to Option Market Traders and earn a bonus when they make their first deposit and trade.'),
   component: ReferralsPage,
 });
 
@@ -29,7 +29,7 @@ function ReferralsPage() {
   const qualified = list.filter(r => r.status === 'rewarded').length;
   const copy = async (text: string) => { await navigator.clipboard.writeText(text); toast.success('Copied'); };
   const share = async () => {
-    if (navigator.share) { try { await navigator.share({ title: 'Join me on SOSDERIV', text: 'Trade digits and Rise/Fall on SOSDERIV.', url: link }); } catch { /* cancelled */ } }
+    if (navigator.share) { try { await navigator.share({ title: 'Join me on Option Market Traders', text: 'Trade digits and Rise/Fall on Option Market Traders.', url: link }); } catch { /* cancelled */ } }
     else void copy(link);
   };
   const amt = reward.data ?? 10;

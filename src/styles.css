@@ -524,7 +524,7 @@ button, a, input { -webkit-tap-highlight-color: transparent; }
 .bot-card select, .bot-card input, .bot-card button { width: 100%; min-width: 0; box-sizing: border-box; }
 .hero.hero-dark .hero-cta a:not(:first-child) { color: var(--hero-ink); border-color: color-mix(in oklab, var(--hero-ink) 45%, transparent); background: transparent; }
 
-/* SOSDERIV theme: dark terminal look with amber accent */
+/* Option Market Traders theme: dark terminal look with amber accent */
 :root {
   --radius: 0.85rem;
   --background: oklch(0.17 0.02 255);
@@ -796,7 +796,7 @@ html.light {
 .onboard-check input { margin-top: .2rem; accent-color: var(--primary); }
 .onboard-nav { display: flex; gap: .5rem; } .onboard-nav > :last-child { flex: 1; }
 
-/* Bot library (Deriv-style quick strategies) */
+/* Bot library (Quick strategy presets) */
 .bot-library { display: grid; gap: .6rem; }
 .bot-library-head { display: flex; justify-content: space-between; align-items: baseline; }
 .bot-library-head h2 { font-size: 15px; font-weight: 600; } .bot-library-head span { font-size: 11px; color: var(--muted-foreground); }

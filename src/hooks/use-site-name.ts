@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export const DEFAULT_SITE_NAME = 'SOSDERIV';
+export const DEFAULT_SITE_NAME = 'Option Market Traders';
 
 export function useSiteName() {
   const query = useQuery({
@@ -10,7 +10,8 @@ export function useSiteName() {
     queryFn: async () => {
       const { data, error } = await supabase.from('site_settings').select('value').eq('key', 'site_name').maybeSingle();
       if (error) throw error;
-      const v = data?.value?.trim(); return !v || v === 'Option Market Traders' ? DEFAULT_SITE_NAME : v;
+      const v = data?.value?.trim();
+      return !v || v === 'SOSDERIV' ? DEFAULT_SITE_NAME : v;
     },
   });
   return query.data ?? DEFAULT_SITE_NAME;

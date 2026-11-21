@@ -11,7 +11,7 @@ import { pageHead } from '@/lib/page-head';
 import { tradeStats } from '@/lib/bot-presets';
 
 export const Route = createFileRoute('/_authenticated/positions')({
-  head: () => pageHead('Positions & Trade History | SOSDERIV', 'Review your demo contracts, win rate, profit factor, streaks and full trade receipts on SOSDERIV.'),
+  head: () => pageHead('Positions & Trade History | Option Market Traders', 'Review your demo contracts, win rate, profit factor, streaks and full trade receipts on Option Market Traders.'),
   component: PositionsPage,
 });
 

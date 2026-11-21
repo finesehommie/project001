@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { pageHead } from '@/lib/page-head';
 import { useSession } from '@/components/session-context';
 
-export const Route = createFileRoute('/reset-password')({ head: () => pageHead('Reset password | SOSDERIV', 'Choose a new password for your SOSDERIV account.'), component: ResetPassword });
+export const Route = createFileRoute('/reset-password')({ head: () => pageHead('Reset password | Option Market Traders', 'Choose a new password for your Option Market Traders account.'), component: ResetPassword });
 function ResetPassword() {
   const { recovery } = useSession();
   const [ready, setReady] = useState(false);

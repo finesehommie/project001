@@ -33,7 +33,7 @@ export function TradingNavigation() {
       <Button variant="ghost" className={open ? 'selected' : ''} onClick={() => setOpen(true)} aria-expanded={open}><Menu /><span>Menu</span></Button>
     </nav>
     <Dialog open={open} onOpenChange={setOpen}><DialogContent className="trading-menu">
-      <DialogTitle>Menu</DialogTitle><DialogDescription>SOSDERIV · Demo account</DialogDescription>
+      <DialogTitle>Menu</DialogTitle><DialogDescription>Option Market Traders · Demo account</DialogDescription>
       <div className="trading-menu-links">
         <Button asChild variant="ghost" onClick={() => setOpen(false)}><Link to="/dashboard"><Wallet /> Accounts <ArrowUpRight /></Link></Button>
         <Button asChild variant="ghost" onClick={() => setOpen(false)}><Link to="/positions"><Clock3 /> Trade history <ArrowUpRight /></Link></Button>
