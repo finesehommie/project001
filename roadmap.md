@@ -6,5 +6,5 @@
 - [x] Implement email/password and Google login, signup, recovery, and sign-out.
 - [x] Verify desktop/mobile layout, market details, real password login, refresh, and sign-out; Google consent and emailed recovery require external user interaction.
 - [x] Practice digit trading (Over/Under, Matches/Differs, Even/Odd) on simulated volatility indices with server-settled virtual balance.
-- [x] Add and verify a balance dashboard with Demo / Real selection and a USA flag; confirmed a demo trade updates activity and balance after refresh, with no mobile page overflow. Real remains inactive without a live trading and payment service.
+- [x] Add a practice balance dashboard and an independent MegaPay M-Pesa merchant-payment history. Merchant payments do not credit practice balances; live brokerage trading is not connected.
 - [x] Admin panel: users + manual deposit records (admin domondi797@gmail.com)

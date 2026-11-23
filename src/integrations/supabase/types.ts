@@ -47,6 +47,51 @@ export type Database = {
         }
         Relationships: []
       }
+      megapay_payments: {
+        Row: {
+          amount_kes: number
+          created_at: string
+          failure_reason: string | null
+          id: string
+          msisdn: string
+          receipt: string | null
+          reference: string
+          status: "initiating" | "pending" | "completed" | "failed" | "review"
+          transaction_id: string | null
+          transaction_request_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_kes: number
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          msisdn: string
+          receipt?: string | null
+          reference: string
+          status?: "initiating" | "pending" | "completed" | "failed" | "review"
+          transaction_id?: string | null
+          transaction_request_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_kes?: number
+          created_at?: string
+          failure_reason?: string | null
+          id?: string
+          msisdn?: string
+          receipt?: string | null
+          reference?: string
+          status?: "initiating" | "pending" | "completed" | "failed" | "review"
+          transaction_id?: string | null
+          transaction_request_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       practice_accounts: {
         Row: {
           balance: number

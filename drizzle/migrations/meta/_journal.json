@@ -92,6 +92,13 @@
       "when": 1795100000000,
       "tag": "0012_withdrawal_compliance_demo",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1795420800000,
+      "tag": "0013_megapay_payments",
+      "breakpoints": true
     }
   ]
 }
